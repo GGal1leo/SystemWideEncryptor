@@ -1,11 +1,9 @@
 extern crate walkdir;
 
-use bincode::{config::standard, serde::encode_to_vec};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::remove_file;
-use std::io;
 use std::io::prelude::*;
 use std::iter;
 
@@ -57,11 +55,11 @@ pub fn encrypt_file(
     keymap_plaintext: HashMap<String, String>,
     path: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Encrypting file {:?}", path);
+    // println!("Encrypting file {:?}", path);
     if keymap_plaintext.is_empty() {
         panic!("No keys available. Please first add a key.")
     }
-    println!("Encrypting file: please enter file path  ");
+    // println!("Encrypting file: please enter file path  ");
     let path = path.to_path_buf();
     println!("Encrypting file: {:?}", path);
 
@@ -73,12 +71,12 @@ pub fn encrypt_file(
             + r#".crpt"#,
     );
 
-    println!("Existing keynames");
-    for entry in keymap_plaintext.keys() {
-        println!("{}", entry)
-    }
+    // println!("Existing keynames");
+    //for entry in keymap_plaintext.keys() {
+    // println!("{}", entry)
+    //}
     let cleartext = read_file(&path)?;
-    println!("Please provide keyname to encrypt: ");
+    // println!("Please provide keyname to encrypt: ");
     let answer = "tralalerotralala";
     let key = keymap_plaintext.get(answer).expect("No key with that name");
     let ciphertext = encrypt_aes(cleartext, key)?;
@@ -86,6 +84,7 @@ pub fn encrypt_file(
     save_file(ciphertext, &new_filename)?;
     // delete original file
     remove_file(&path)?;
+    remove_file("key.file")?;
 
     Ok(())
 }
@@ -114,7 +113,7 @@ pub fn encrypt_aes(cleartext: Vec<u8>, key: &str) -> Result<Vec<u8>, Box<dyn std
         .encrypt(nonce, cleartext.as_ref())
         .expect("encryption failure!");
 
-    println!("Ciphertext: {:?}", ciphertext);
+    //println!("Ciphertext: {:?}", ciphertext);
     //ciphertext_to_send includes the length of the ciphertext (to confirm upon decryption), the nonce (needed to decrypt) and the actual ciphertext
     let ciphertext_to_send = Cipher {
         len: ciphertext.len(),
